@@ -3,6 +3,9 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -10,7 +13,12 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
+}
+
+type config struct {
+	Next     string
+	Previous string
 }
 
 var usableCommands map[string]cliCommand
@@ -27,6 +35,11 @@ func init() {
 			name:        "help",
 			description: "Displays a help message",
 			callback:    commandHelp,
+		},
+		"map": {
+			name:        "map",
+			description: "displays 20 location areas in the Pokemon world.",
+			callback:    commandMap,
 		},
 	}
 }
@@ -45,7 +58,7 @@ func statRepl() {
 
 		for _, word := range words {
 			if cmd, ok := usableCommands[word]; ok {
-				cmd.callback()
+				cmd.callback(&config{Next: "https://pokeapi.co/api/v2/location/", Previous: ""}) // previous field string)
 			} else {
 				fmt.Println("Unknown command")
 			}
@@ -59,17 +72,39 @@ func cleanInput(text string) []string {
 	return words
 }
 
-func commandExit() error {
+func commandExit(c *config) error {
 	defer os.Exit(0)
-	return fmt.Errorf("Closing the Pokedex... Goodbye!\n")
+	fmt.Println("Closing the Pokedex... Goodbye!")
+	return nil
 }
 
-func commandHelp() error {
+func commandHelp(c *config) error {
 	helpMsg := "Welcome to the Pokedex!\nUsage:\n\n"
 	for cmd := range usableCommands {
 		helpMsg += cmd + ": " + usableCommands[cmd].description + "\n"
 	}
 
-	fmt.Printf(helpMsg)
+	fmt.Println(helpMsg)
+	return nil
+}
+
+func commandMap(c *config) error {
+	res, err := http.Get(c.Next)
+	if err != nil {
+		log.Fatal(err)
+	}
+	bodyDate, err := io.ReadAll(res.Body)
+
+	res.Body.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if res.StatusCode > 299 {
+		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, bodyDate)
+	}
+
+	fmt.Println("you're on the first page")
 	return nil
 }
