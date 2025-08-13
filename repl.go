@@ -3,28 +3,22 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
 	"os"
 	"strings"
+
+	"github.com/mcoluomo/pokedexcli/internal/pokeapi"
 )
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*pokeapi.Config) error
 }
 
-type config struct {
-	Next     string
-	Previous string
-}
-
-var usableCommands map[string]cliCommand
+var UsableCommands map[string]cliCommand
 
 func init() {
-	usableCommands = map[string]cliCommand{
+	UsableCommands = map[string]cliCommand{
 		"exit": {
 			name:        "exit",
 			description: "Exit the Pokedex",
@@ -39,7 +33,7 @@ func init() {
 		"map": {
 			name:        "map",
 			description: "displays 20 location areas in the Pokemon world.",
-			callback:    commandMap,
+			callback:    pokeapi.CommandMap,
 		},
 	}
 }
@@ -57,8 +51,8 @@ func statRepl() {
 		}
 
 		for _, word := range words {
-			if cmd, ok := usableCommands[word]; ok {
-				cmd.callback(&config{Next: "https://pokeapi.co/api/v2/location/", Previous: ""}) // previous field string)
+			if cmd, ok := UsableCommands[word]; ok {
+				cmd.callback(&pokeapi.Config{Next: "https://pokeapi.co/api/v2/location/", Previous: ""}) // previous field string)
 			} else {
 				fmt.Println("Unknown command")
 			}
@@ -72,39 +66,17 @@ func cleanInput(text string) []string {
 	return words
 }
 
-func commandExit(c *config) error {
+func commandExit(c *pokeapi.Config) error {
 	defer os.Exit(0)
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	return nil
 }
 
-func commandHelp(c *config) error {
+func commandHelp(c *pokeapi.Config) error {
 	helpMsg := "Welcome to the Pokedex!\nUsage:\n\n"
-	for cmd := range usableCommands {
-		helpMsg += cmd + ": " + usableCommands[cmd].description + "\n"
+	for cmd := range UsableCommands {
+		helpMsg += cmd + ": " + UsableCommands[cmd].description + "\n"
 	}
-
 	fmt.Println(helpMsg)
-	return nil
-}
-
-func commandMap(c *config) error {
-	res, err := http.Get(c.Next)
-	if err != nil {
-		log.Fatal(err)
-	}
-	bodyDate, err := io.ReadAll(res.Body)
-
-	res.Body.Close()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if res.StatusCode > 299 {
-		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, bodyDate)
-	}
-
-	fmt.Println("you're on the first page")
 	return nil
 }
