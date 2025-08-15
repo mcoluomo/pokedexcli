@@ -32,7 +32,7 @@ func init() {
 		},
 		"map": {
 			name:        "map",
-			description: "displays 20 location areas in the Pokemon world.",
+			description: "displays next 20 location areas in the Pokemon world.",
 			callback:    pokeapi.CommandMap,
 		},
 	}
@@ -52,7 +52,7 @@ func statRepl() {
 
 		for _, word := range words {
 			if cmd, ok := UsableCommands[word]; ok {
-				cmd.callback(&pokeapi.Config{Next: "https://pokeapi.co/api/v2/location/", Previous: ""}) // previous field string)
+				cmd.callback(&pokeapi.Config{Next: "https://pokeapi.co/api/v2/location-area/", Previous: ""}) // previous field string)
 			} else {
 				fmt.Println("Unknown command")
 			}
