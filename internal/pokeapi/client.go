@@ -10,7 +10,7 @@ import (
 
 type LocationAreaList struct {
 	Count    int     `json:"count"`
-	Next     string  `json:"next"`
+	Next     *string `json:"next"`
 	Previous *string `json:"previous"`
 	Results  []struct {
 		Name string `json:"name"`
@@ -45,14 +45,50 @@ func CommandMap(c *Config) error {
 		log.Fatalf("Json decode failure: %v", err)
 	}
 
-	// case when when next is nil
-
-	if locationAreas.Previous == nil {
-		fmt.Println("you're on the first page")
+	if locationAreas.Next == nil {
+		fmt.Println("you're on the last page")
+		return nil
 	}
 	for _, pokeLocation := range locationAreas.Results {
 		fmt.Println(pokeLocation.Name)
 	}
+
+	c.Next = *locationAreas.Next
+
+	return nil
+}
+
+func CommandMapBack(c *Config) error {
+	res, err := http.Get(c.Previous)
+	if err != nil {
+		log.Fatal(err)
+	}
+	bodyDate, err := io.ReadAll(res.Body)
+
+	res.Body.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if res.StatusCode > 299 {
+		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, bodyDate)
+	}
+
+	var locationAreas LocationAreaList
+	if err := json.Unmarshal(bodyDate, &locationAreas); err != nil {
+		log.Fatalf("Json decode failure: %v", err)
+	}
+
+	if locationAreas.Previous == nil {
+		fmt.Println("you're on the first page")
+		return nil
+	}
+	for _, pokeLocation := range locationAreas.Results {
+		fmt.Println(pokeLocation.Name)
+	}
+
+	c.Previous = *locationAreas.Previous
 
 	return nil
 }
