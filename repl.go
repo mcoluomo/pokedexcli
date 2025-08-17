@@ -38,12 +38,16 @@ func init() {
 		"mapb": {
 			name:        "mapb",
 			description: "displays previous 20 location areas in the Pokemon world.",
-			callback:    pokeapi.CommandMap,
+			callback:    pokeapi.CommandMapBack,
 		},
 	}
 }
 
 func statRepl() {
+	c := &pokeapi.Config{
+		Next:     "https://pokeapi.co/api/v2/location-area/",
+		Previous: "https://pokeapi.co/api/v2/location-area/",
+	}
 	reader := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -57,11 +61,9 @@ func statRepl() {
 
 		for _, word := range words {
 			if cmd, ok := UsableCommands[word]; ok {
-				cmd.callback(&pokeapi.Config{
-					Next:     "https://pokeapi.co/api/v2/location-area/",
-					Previous: "https://pokeapi.co/api/v2/location-area/",
-				},
-				)
+				fmt.Println(cmd.name)
+
+				cmd.callback(c)
 			} else {
 				fmt.Println("Unknown command")
 			}
