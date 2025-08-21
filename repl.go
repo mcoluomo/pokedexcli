@@ -74,6 +74,11 @@ func statRepl() {
 func cleanInput(text string) []string {
 	output := strings.ToLower(text)
 	words := strings.Fields(output)
+
+	if len(words) == 0 {
+		return []string{""}
+	}
+
 	return words
 }
 

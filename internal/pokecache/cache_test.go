@@ -59,3 +59,30 @@ func TestReapLoop(t *testing.T) {
 		return
 	}
 }
+
+func TestCacheMultipleEntries(t *testing.T) {
+	cache := NewCache(time.Second * 5)
+
+	testData := map[string][]byte{
+		"key1": []byte("value1"),
+		"key2": []byte("value2"),
+		"key3": []byte("value3"),
+	}
+
+	// Add multiple entries
+	for key, value := range testData {
+		cache.Add(key, value)
+	}
+
+	// Verify all entries exist
+	for key, expectedValue := range testData {
+		result, found := cache.Get(key)
+		if !found {
+			t.Errorf("Expected to find key: %s", key)
+		}
+
+		if string(result) != string(expectedValue) {
+			t.Errorf("For key %s, expected %s, got %s", key, string(expectedValue), string(result))
+		}
+	}
+}

@@ -21,14 +21,14 @@ func NewCache(interval time.Duration) *Cache {
 	return &cache
 }
 
-func (c *Cache) Add(url string, data []byte) {
+func (c *Cache) Add(url string, val []byte) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
-	c.Entry[url] = cacheEntry{createdAt: time.Now(), val: data}
+	c.Entry[url] = cacheEntry{createdAt: time.Now(), val: val}
 }
 
 func (c *Cache) Get(key string) ([]byte, bool) {
-	c.mutex.Unlock()
+	c.mutex.Lock()
 
 	_, ok := c.Entry[key]
 	var data []byte

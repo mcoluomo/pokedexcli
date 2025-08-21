@@ -30,7 +30,7 @@ func TestCleanInput(t *testing.T) {
 			Expecting length:  %d
 			Actual length:     %d
 			Fail
-			`, len(actual), len(c.expected))
+			`, len(c.expected), len(actual))
 		}
 		// Check the length of the actual slice against the expected slice
 		// if they don't match, use t.Errorf to print an error message
