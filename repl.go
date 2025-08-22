@@ -12,7 +12,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*pokeapi.Config) error
+	callback    func(*pokeapi.Config, string) error
 }
 
 var UsableCommands map[string]cliCommand
@@ -40,6 +40,11 @@ func init() {
 			description: "displays previous 20 location areas in the Pokemon world.",
 			callback:    pokeapi.CommandMapBack,
 		},
+		"explore": {
+			name:        "explore",
+			description: "displays the specific location of an area",
+			callback:    pokeapi.CommandExplore,
+		},
 	}
 }
 
@@ -59,11 +64,14 @@ func statRepl() {
 			continue
 		}
 
-		for _, word := range words {
+		for i, word := range words {
 			if cmd, ok := UsableCommands[word]; ok {
 				fmt.Println(cmd.name)
-
-				cmd.callback(c)
+				if cmd.name == "explore" {
+					cmd.callback(c, words[i+1])
+				} else {
+					cmd.callback(c, "")
+				}
 			} else {
 				fmt.Println("Unknown command")
 			}
@@ -82,13 +90,13 @@ func cleanInput(text string) []string {
 	return words
 }
 
-func commandExit(c *pokeapi.Config) error {
+func commandExit(c *pokeapi.Config, areaName string) error {
 	defer os.Exit(0)
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	return nil
 }
 
-func commandHelp(c *pokeapi.Config) error {
+func commandHelp(c *pokeapi.Config, areaName string) error {
 	helpMsg := "Welcome to the Pokedex!\nUsage:\n\n"
 	for cmd := range UsableCommands {
 		helpMsg += cmd + ": " + UsableCommands[cmd].description + "\n"
