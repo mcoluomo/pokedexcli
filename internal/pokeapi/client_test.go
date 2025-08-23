@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestDecodeAndOutputRequstData(t *testing.T) {
+func TestDecodeResBody(t *testing.T) {
 	// Sample JSON response similar to what the API would return
 	jsonResponse := `{
 		"count": 1302,
@@ -28,7 +28,7 @@ func TestDecodeAndOutputRequstData(t *testing.T) {
 	}
 
 	// Test the decode function
-	DecodeAndOutputRequstData(config, []byte(jsonResponse))
+	DecodeResBody(config, []byte(jsonResponse))
 
 	// Verify that config was updated correctly
 	expectedNext := "https://pokeapi.co/api/v2/location-area/?offset=20&limit=20"
@@ -41,7 +41,7 @@ func TestDecodeAndOutputRequstData(t *testing.T) {
 	}
 }
 
-func TestDecodeAndOutputRequstDataWithPrevious(t *testing.T) {
+func TestDecodeResBodyWithPrevious(t *testing.T) {
 	// JSON with both next and previous
 	jsonResponse := `{
 		"count": 1302,
@@ -56,7 +56,7 @@ func TestDecodeAndOutputRequstDataWithPrevious(t *testing.T) {
 	}`
 
 	config := &Config{}
-	DecodeAndOutputRequstData(config, []byte(jsonResponse))
+	DecodeResBody(config, []byte(jsonResponse))
 
 	expectedNext := "https://pokeapi.co/api/v2/location-area/?offset=40&limit=20"
 	expectedPrevious := "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"

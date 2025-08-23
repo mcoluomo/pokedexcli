@@ -64,11 +64,13 @@ func statRepl() {
 			continue
 		}
 
-		for i, word := range words {
+		for idx, word := range words {
 			if cmd, ok := UsableCommands[word]; ok {
-				fmt.Println(cmd.name)
-				if cmd.name == "explore" {
-					cmd.callback(c, words[i+1])
+				if cmd.name == "explore" && idx < len(words)-1 {
+					locName := words[idx+1]
+					cmd.callback(c, locName)
+					break
+
 				} else {
 					cmd.callback(c, "")
 				}
