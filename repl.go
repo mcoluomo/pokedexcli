@@ -42,8 +42,13 @@ func init() {
 		},
 		"explore": {
 			name:        "explore",
-			description: "displays the specific location of an area",
+			description: "Lists all the pokemon of an area",
 			callback:    pokeapi.CommandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Lets us catch a pokemon",
+			callback:    pokeapi.CommandCatch,
 		},
 	}
 }
@@ -64,18 +69,27 @@ func statRepl() {
 			continue
 		}
 
-		for idx, word := range words {
-			if cmd, ok := UsableCommands[word]; ok {
-				if cmd.name == "explore" && idx < len(words)-1 {
-					locName := words[idx+1]
-					cmd.callback(c, locName)
-					break
+		commandName := words[0]
+		cmd, exists := UsableCommands[commandName]
+		if !exists {
+			fmt.Println("Unknown command")
+			continue
+		}
 
-				} else {
-					cmd.callback(c, "")
-				}
-			} else {
-				fmt.Println("Unknown command")
+		if commandName == "explore" || commandName == "catch" {
+			if len(words) < 2 {
+				fmt.Printf("Argument missing. Please provide: %s <argument_name>\n", commandName)
+				continue
+			}
+			err := cmd.callback(c, words[1])
+			if err != nil {
+				fmt.Printf("Error: %v\n", err)
+			}
+
+		} else {
+			err := cmd.callback(c, "")
+			if err != nil {
+				fmt.Printf("Error: %v\n", err)
 			}
 		}
 	}
