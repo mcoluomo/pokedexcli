@@ -7,12 +7,12 @@ import (
 
 var Rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-func SimpleCatch(captureRate int, ballBonus float64) bool {
+func SimpleCatch(captureRate int, ballBonus float64) (float64, bool) {
 	adjusted := float64(captureRate) * ballBonus
 
 	chance := adjusted / 255.0
 
-	return Rng.Float64() < chance
+	return Rng.Float64(), Rng.Float64() < chance
 }
 
 func RandomBonus() float64 {

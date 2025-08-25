@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -27,28 +28,33 @@ func init() {
 
 		"help": {
 			name:        "help",
-			description: "Displays a help message",
+			description: "displays a help message",
 			callback:    commandHelp,
 		},
 		"map": {
 			name:        "map",
-			description: "displays next 20 location areas in the Pokemon world.",
+			description: "displays next 20 location areas in the pokemon world.",
 			callback:    pokeapi.CommandMap,
 		},
 		"mapb": {
 			name:        "mapb",
-			description: "displays previous 20 location areas in the Pokemon world.",
+			description: "displays previous 20 location areas in the pokemon world.",
 			callback:    pokeapi.CommandMapBack,
 		},
 		"explore": {
 			name:        "explore",
-			description: "Lists all the pokemon of an area",
+			description: "lists all the pokemon of an area",
 			callback:    pokeapi.CommandExplore,
 		},
 		"catch": {
 			name:        "catch",
-			description: "Lets us catch a pokemon",
+			description: "lets us catch a pokemon",
 			callback:    pokeapi.CommandCatch,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "prints the name, height, weight, stats and type(s) of the Pokemon",
+			callback:    pokeapi.CommandInspect,
 		},
 	}
 }
@@ -76,20 +82,20 @@ func statRepl() {
 			continue
 		}
 
-		if commandName == "explore" || commandName == "catch" {
+		if commandName == "explore" || commandName == "catch" || commandName == "inspect" {
 			if len(words) < 2 {
-				fmt.Printf("Argument missing. Please provide: %s <argument_name>\n", commandName)
+				fmt.Printf("argument missing. please provide: %s <argument_name>\n", commandName)
 				continue
 			}
 			err := cmd.callback(c, words[1])
 			if err != nil {
-				fmt.Printf("Error: %v\n", err)
+				log.Fatalf("error: %v\n", err)
 			}
 
 		} else {
 			err := cmd.callback(c, "")
 			if err != nil {
-				fmt.Printf("Error: %v\n", err)
+				log.Fatalf("error: %v\n", err)
 			}
 		}
 	}

@@ -12,7 +12,7 @@ import (
 
 var cache = pokecache.NewCache(15)
 
-var dex = NewPokedex()
+var Dex = NewPokedex()
 
 type LocationAreas struct {
 	Count    int     `json:"count"`
@@ -145,59 +145,6 @@ func CommandMapBack(c *Config, areaName string) error {
 	cache.Add(c.Previous, responseBody)
 
 	DecodeResBody(c, responseBody)
-
-	return nil
-}
-
-func CommandCatch(c *Config, pokeName string) error {
-	fmt.Printf("Throwing a Pokeball at %s...\n", pokeName)
-	pokeSpecies := "https://pokeapi.co/api/v2/pokemon-species/" + pokeName
-
-	if InDex := dex.HasPokemon(pokeName); InDex {
-		fmt.Println(pokeName, "is already in the deck")
-		return nil
-	}
-
-	var responseBody []byte
-
-	if cachedResBody, inCache := cache.Get(pokeSpecies); inCache {
-		fmt.Println("Using cached data...")
-		responseBody = cachedResBody
-	} else {
-		res, err := http.Get(pokeSpecies)
-		if err != nil {
-			return fmt.Errorf("failed to fetch response: %w", err)
-		}
-		defer res.Body.Close()
-
-		responseBody, err = io.ReadAll(res.Body)
-		if err != nil {
-			return fmt.Errorf("failed to read response: %w", err)
-		}
-
-		if res.StatusCode > 299 {
-			return fmt.Errorf("API request failed with status %d", res.StatusCode)
-		}
-
-		cache.Add(pokeSpecies, responseBody)
-
-	}
-
-	var pokeInfo PokemonInfo
-	if err := json.Unmarshal(responseBody, &pokeInfo); err != nil {
-		return fmt.Errorf("failed to decode pokemon data: %w", err)
-	}
-
-	dex.AddPokemon(pokeName, pokeInfo)
-
-	bonus := RandomBonus()
-	caught := SimpleCatch(pokeInfo.CaptureRate, bonus)
-
-	if caught {
-		fmt.Printf("%s was caught! (Capture rate: %d)\n", pokeName, pokeInfo.CaptureRate)
-	} else {
-		fmt.Printf("%s escaped! (Capture rate: %d)\n", pokeName, pokeInfo.CaptureRate)
-	}
 
 	return nil
 }
