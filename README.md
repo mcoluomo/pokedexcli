@@ -20,18 +20,13 @@ A command-line interface (CLI) Pokedex application written in Go. This project a
 
 ### Installation
 
-1.  **Clone the repository:**
+- **Clone the repository:**
 
     ```bash
     git clone https://github.com/mcoluomo/pokedexcli.git
     cd pokedexcli
     ```
 
-2.  **Build the application:**
-
-    ```bash
-    go build -o pokedex .
-    ```
 
 ### Usage
 
