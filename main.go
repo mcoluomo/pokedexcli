@@ -1,5 +1,8 @@
 package main
 
+import "github.com/mcoluomo/pokedexcli/cli"
+
 func main() {
-	statRepl()
+	repl := cli.NewREPL()
+	repl.Start()
 }

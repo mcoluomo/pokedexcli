@@ -1,2 +1,7 @@
 pokedexcli
 repl.log
+*.log
+pokedex  # Executable file
+
+# Go modules
+go.sum
